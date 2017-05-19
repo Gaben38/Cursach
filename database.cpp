@@ -6,7 +6,7 @@ QWidget *mainw; // виджет главного окна
 MainWindow *param2; // главное окно
 bool can_edit; // право редактирования активного юзера
 QSqlDatabase ikea_db; // рабочая база данных
- QSqlTableModel *model; // табличная модель для базы данных
+QSqlTableModel *model; // табличная модель для базы данных
 
 Database::Database(QWidget *parent, MainWindow *test, int _id, QString username, bool can_edit_param) : // username - логин активного юзера
     QDialog(parent),
@@ -38,9 +38,17 @@ Database::Database(QWidget *parent, MainWindow *test, int _id, QString username,
     }
 
     ui->amountLeftProgressbar->setAlignment(Qt::AlignCenter);
-    QString danger = "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #FF0350,stop: 0.4999 #FF0020,stop: 0.5 #FF0019,stop: 1 #FF0000 );border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;border: .px solid black;}";
-    QString safe= "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #78d,stop: 0.4999 #46a,stop: 0.5 #45a,stop: 1 #238 );border-bottom-right-radius: 7px;border-bottom-left-radius: 7px;border: 1px solid black;}";
-    ui->amountLeftProgressbar->setStyleSheet(safe);
+    QString style_0_60      = "QProgressBar::chunk{ background-color: green; }";
+    QString style_60_80     = "QProgressBar::chunk{ background-color: orange; }";
+    QString style_80_100    = "QProgressBar::chunk{ background-color: red; }";
+    ui->amountLeftProgressbar->setStyleSheet(style_80_100);
+
+    if(!(QDir(QDir::currentPath() + "/ikea_imgs").exists()))
+    {
+        if(QDir().mkdir(QDir::currentPath() + "/ikea_imgs")) qDebug() << "creating directory";
+        else qDebug() << "govno v papke";
+    }
+    qDebug() << QDir::currentPath() ;
 }
 
 Database::~Database()
@@ -190,4 +198,47 @@ void Database::on_resetsearchButton_clicked()
 {
     ui->tableView->setModel(model); // ставим модель для tableView и обновляем его
     ui->tableView->show();
+}
+
+void Database::on_amountLeftProgressbar_valueChanged(int value)
+{
+    QString style_40_100      = "QProgressBar::chunk{ background-color: green; }";
+    QString style_20_40     = "QProgressBar::chunk{ background-color: orange; }";
+    QString style_0_20    = "QProgressBar::chunk{ background-color: red; }";
+    if(value>=40) ui->amountLeftProgressbar->setStyleSheet(style_40_100);
+    else if(value>=20) ui->amountLeftProgressbar->setStyleSheet(style_20_40);
+    else ui->amountLeftProgressbar->setStyleSheet(style_0_20);
+}
+
+void Database::on_tableView_clicked(const QModelIndex &index)
+{
+     int i = index.row();
+     QString img_path = "Img_missing";
+     i++;
+     qDebug() << i;
+     QSqlQuery query(ikea_db);
+     query.prepare("SELECT * FROM ikea_table WHERE id = (:id)");
+     query.bindValue(":id",i);
+
+     if(!query.exec()) qDebug() << "search failed" << query.lastError().text();
+     while(query.next())
+     {
+            ui->elemNameLabel->setText(query.value(1).toString());
+            ui->elemTypeLabel->setText(query.value(2).toString());
+            ui->elemCostLabel->setText(query.value(3).toString());
+            ui->amountLeftProgressbar->setValue(query.value(4).toInt());
+
+            img_path = QDir::currentPath() + "/ikea_imgs/" + QString::number(i);
+            qDebug() << img_path;
+
+            if(QFile(img_path+".png").exists()) img_path+=".png";
+            else if(QFile(img_path+".jpg").exists()) img_path+=".jpg";
+
+            if(img_path!="Img_missing")
+            {
+                QPixmap pixElem(img_path);
+                ui->elemImgLabel->setPixmap(pixElem);
+            }
+            else ui->elemImgLabel->setText(img_path);
+     }
 }

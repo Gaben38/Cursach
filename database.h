@@ -9,6 +9,7 @@
 #include <QSqlTableModel>
 #include <QPixmap>
 #include <QSqlError>
+#include <QDir>
 #include "mainwindow.h"
 
 namespace Ui {
@@ -37,6 +38,10 @@ private slots:
     void on_exitButton_clicked();
 
     void on_resetsearchButton_clicked();
+
+    void on_amountLeftProgressbar_valueChanged(int value);
+
+    void on_tableView_clicked(const QModelIndex &index);
 
 private:
     Ui::Database *ui;
