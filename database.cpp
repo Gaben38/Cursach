@@ -36,6 +36,11 @@ Database::Database(QWidget *parent, MainWindow *test, int _id, QString username,
         msgBox.setText("Ошибка при загрузке базы данных ikea.");
         msgBox.exec();
     }
+
+    ui->amountLeftProgressbar->setAlignment(Qt::AlignCenter);
+    QString danger = "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #FF0350,stop: 0.4999 #FF0020,stop: 0.5 #FF0019,stop: 1 #FF0000 );border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;border: .px solid black;}";
+    QString safe= "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #78d,stop: 0.4999 #46a,stop: 0.5 #45a,stop: 1 #238 );border-bottom-right-radius: 7px;border-bottom-left-radius: 7px;border: 1px solid black;}";
+    ui->amountLeftProgressbar->setStyleSheet(safe);
 }
 
 Database::~Database()
