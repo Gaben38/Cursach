@@ -1,12 +1,17 @@
 #include "database.h"
 #include "ui_database.h"
 #include "registerwindow.h"
+#include "newitemwindow.h"
 
 QWidget *mainw; // виджет главного окна
 MainWindow *param2; // главное окно
 bool can_edit; // право редактирования активного юзера
 QSqlDatabase ikea_db; // рабочая база данных
 QSqlTableModel *model; // табличная модель для базы данных
+
+QString style_40_100      = "QProgressBar::chunk{ background-color: green; }"; // зеленый цвет прогрессбара для количества товара 40-100
+QString style_20_40     = "QProgressBar::chunk{ background-color: orange; }"; // оранжевый для 20-40
+QString style_0_20    = "QProgressBar::chunk{ background-color: red; }"; // красный для 0-20
 
 Database::Database(QWidget *parent, MainWindow *test, int _id, QString username, bool can_edit_param) : // username - логин активного юзера
     QDialog(parent),
@@ -28,6 +33,7 @@ Database::Database(QWidget *parent, MainWindow *test, int _id, QString username,
     ui->nameLabel->setText(username); // выводим логин в nameLabel
     qDebug() << "id =" <<_id;
     if(_id==1) ui->registerButton->setEnabled(true);
+    if(_id==1) ui->newDBelemButton->setEnabled(true);
     if(!loadDb("ikea_db.db"))
     {
         qDebug() << "ошибка при загрузке базы данных икеа";
@@ -38,15 +44,12 @@ Database::Database(QWidget *parent, MainWindow *test, int _id, QString username,
     }
 
     ui->amountLeftProgressbar->setAlignment(Qt::AlignCenter);
-    QString style_0_60      = "QProgressBar::chunk{ background-color: green; }";
-    QString style_60_80     = "QProgressBar::chunk{ background-color: orange; }";
-    QString style_80_100    = "QProgressBar::chunk{ background-color: red; }";
-    ui->amountLeftProgressbar->setStyleSheet(style_80_100);
+    ui->amountLeftProgressbar->setStyleSheet(style_40_100);
 
     if(!(QDir(QDir::currentPath() + "/ikea_imgs").exists()))
     {
         if(QDir().mkdir(QDir::currentPath() + "/ikea_imgs")) qDebug() << "creating directory";
-        else qDebug() << "govno v papke";
+        else qDebug() << "error creating directory";
     }
     qDebug() << QDir::currentPath() ;
 }
@@ -196,15 +199,11 @@ void Database::on_exitButton_clicked()
 
 void Database::on_resetsearchButton_clicked()
 {
-    ui->tableView->setModel(model); // ставим модель для tableView и обновляем его
-    ui->tableView->show();
+    refreshTableView();
 }
 
 void Database::on_amountLeftProgressbar_valueChanged(int value)
 {
-    QString style_40_100      = "QProgressBar::chunk{ background-color: green; }";
-    QString style_20_40     = "QProgressBar::chunk{ background-color: orange; }";
-    QString style_0_20    = "QProgressBar::chunk{ background-color: red; }";
     if(value>=40) ui->amountLeftProgressbar->setStyleSheet(style_40_100);
     else if(value>=20) ui->amountLeftProgressbar->setStyleSheet(style_20_40);
     else ui->amountLeftProgressbar->setStyleSheet(style_0_20);
@@ -225,7 +224,7 @@ void Database::on_tableView_clicked(const QModelIndex &index)
      {
             ui->elemNameLabel->setText(query.value(1).toString());
             ui->elemTypeLabel->setText(query.value(2).toString());
-            ui->elemCostLabel->setText(query.value(3).toString());
+            ui->elemCostLabel->setText(query.value(3).toString() + " руб.");
             ui->amountLeftProgressbar->setValue(query.value(4).toInt());
 
             img_path = QDir::currentPath() + "/ikea_imgs/" + QString::number(i);
@@ -241,4 +240,89 @@ void Database::on_tableView_clicked(const QModelIndex &index)
             }
             else ui->elemImgLabel->setText(img_path);
      }
+}
+
+int Database::getMaxIndex()
+{
+    QSqlQuery query(ikea_db);
+    query.prepare("SELECT MAX(id) FROM ikea_table");
+    if(!query.exec())
+    {
+        qDebug() << "shit is broken" << query.lastError().text();
+        return -1;
+    }
+    else
+    {
+        while(query.next())
+        {
+            qDebug() << query.value(0).toString();
+            return query.value(0).toInt();
+        }
+        return -1;
+
+    }
+}
+
+void Database::refreshTableView()
+{
+    model->select();
+    ui->tableView->setModel(model); // ставим модель для tableView и обновляем его
+    ui->tableView->show();
+}
+
+void Database::fourth_window_finished()
+{
+    refreshTableView();
+}
+
+void Database::on_newDBelemButton_clicked()
+{
+    NewItemWindow *fourth_window = new NewItemWindow(this);
+    connect(fourth_window, SIGNAL(finished(int)),this, SLOT(fourth_window_finished()));
+    fourth_window->show();
+}
+
+bool Database::newIkeaItem(QString name, int type, int price, int number, QString imgPath)
+{
+    QSqlQuery item_query(ikea_db);
+    item_query.prepare("INSERT INTO ikea_table (name, type, price, number) "
+                         "VALUES (:name, :type, :price, :number)");
+
+    item_query.bindValue(":name", name);
+
+    switch(type){
+    case 1: item_query.bindValue(":type","мебель"); break;
+    case 2: item_query.bindValue(":type","посуда"); break;
+    case 3: item_query.bindValue(":type","другое"); break;
+    default: item_query.bindValue(":type","другое"); break;
+    }
+    item_query.bindValue(":price",price);
+    item_query.bindValue(":number",number);
+
+    if(!item_query.exec())
+    {
+        qDebug() << "new item insert query failed: " << item_query.lastError().text();
+        return false;
+    }
+    else
+    {
+        QFileInfo imgFileInfo(imgPath);
+        QString fileExtension = "." + imgFileInfo.suffix();
+
+        int maxIndex = getMaxIndex();
+        if(maxIndex==-1) return false;
+
+        QString imgDir = QDir::currentPath() + "/ikea_imgs/" + QString::number(maxIndex) + fileExtension;
+        qDebug() << imgDir;
+        if(!QFile::copy(imgPath, imgDir))
+        {
+           qDebug() << "file copy failed";
+           return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
 }

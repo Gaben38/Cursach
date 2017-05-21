@@ -27,14 +27,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     database.cpp \
     registerwindow.cpp \
-    passremindwindow.cpp
+    passremindwindow.cpp \
+    newitemwindow.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
     registerwindow.h \
-    passremindwindow.h
+    passremindwindow.h \
+    newitemwindow.h
 
 FORMS    += mainwindow.ui \
     database.ui \
     registerwindow.ui \
-    passremindwindow.ui
+    passremindwindow.ui \
+    newitemwindow.ui
