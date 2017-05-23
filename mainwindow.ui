@@ -31,6 +31,13 @@
   <property name="windowTitle">
    <string>Вход</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../ikea_icon_7bQ_icon.ico</normaloff>../../ikea_icon_7bQ_icon.ico</iconset>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLineEdit" name="loginEdit">
     <property name="geometry">
@@ -111,17 +118,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>261</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

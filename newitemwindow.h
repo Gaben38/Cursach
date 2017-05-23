@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QPixmap>
 #include <QMessageBox>
+#include <QStandardPaths>
 #include <database.h>
 
 namespace Ui {

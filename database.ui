@@ -75,6 +75,9 @@
      <height>31</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Доступно только для admin.</string>
+   </property>
    <property name="text">
     <string>Регистрация нового пользователя</string>
    </property>
@@ -86,7 +89,7 @@
    <property name="geometry">
     <rect>
      <x>770</x>
-     <y>120</y>
+     <y>70</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -99,7 +102,7 @@
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>120</y>
+     <y>70</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -114,7 +117,7 @@
      <x>770</x>
      <y>20</y>
      <width>231</width>
-     <height>91</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -131,9 +134,9 @@
    <property name="geometry">
     <rect>
      <x>770</x>
-     <y>140</y>
+     <y>90</y>
      <width>231</width>
-     <height>141</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
@@ -155,17 +158,17 @@
      <number>-1</number>
     </property>
     <property name="maxVisibleItems">
-     <number>2</number>
+     <number>4</number>
     </property>
     <property name="maxCount">
-     <number>2</number>
+     <number>4</number>
     </property>
    </widget>
    <widget class="QLineEdit" name="searchLineEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>80</y>
       <width>211</width>
       <height>20</height>
      </rect>
@@ -175,7 +178,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>100</y>
+      <y>160</y>
       <width>211</width>
       <height>23</height>
      </rect>
@@ -187,6 +190,108 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="searchButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>211</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Поиск</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="priceRangeFromLabel">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>От</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="priceRangeToLabel">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>80</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>До</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="searchDescLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>211</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Введите id</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="priceRangeFromSpinbox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="priceRangeToSpinbox">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>100</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="correctionMode">
+     <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+    <property name="value">
+     <number>999999</number>
+    </property>
+   </widget>
+   <zorder>searchComboBox</zorder>
+   <zorder>resetsearchButton</zorder>
+   <zorder>searchButton</zorder>
+   <zorder>searchLineEdit</zorder>
+   <zorder>priceRangeFromLabel</zorder>
+   <zorder>priceRangeToLabel</zorder>
+   <zorder>searchDescLabel</zorder>
+   <zorder>priceRangeFromSpinbox</zorder>
+   <zorder>priceRangeToSpinbox</zorder>
   </widget>
   <widget class="QGroupBox" name="passChangeGroup">
    <property name="geometry">
@@ -280,6 +385,9 @@
      <width>231</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Доступно только для admin.</string>
    </property>
    <property name="text">
     <string>Добавить новый товар</string>

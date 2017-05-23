@@ -7,6 +7,7 @@
 QT       += core gui
 QT       += sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+win32: RC_ICONS = ikeaicon.ico
 
 TARGET = CMV_Cursach
 TEMPLATE = app

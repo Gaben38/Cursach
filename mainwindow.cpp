@@ -24,6 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QIcon icon("ikeaicon.ico");
+    this->setWindowIcon(icon);
+
     db = QSqlDatabase::addDatabase("QSQLITE"); // дефолтное соединение драйвером sqlite
     db.setDatabaseName("pass_db.db");  // к базе данных pass_db.db
 
@@ -164,8 +167,8 @@ bool MainWindow::registerNewUser(QString login, QString password, bool can_edit,
 
 bool MainWindow::recoverPass(QString sAnswer)
 {
-    bool found_login = false;
-    bool right_answer = false;
+    bool found_login = false; // найден ли такой логин
+    bool right_answer = false; // правильный ли ответ
     QString password;
     QSqlQuery query1(db);
     query1.prepare("SELECT password, s_answer FROM passtable WHERE login = (:login)"); // запрос вернет  пароль и ответ на секретный вопрос из записи с нужным логином, если такая есть
@@ -178,38 +181,39 @@ bool MainWindow::recoverPass(QString sAnswer)
     }
     else
     {
-    while(query1.next())
+    while(query1.next()) // перебираем результат
     {
-        found_login = true;
-        if(query1.value(1).toString()==sAnswer)
+        found_login = true; // если хотя бы одна запись с таким логином, то ставим флаг на true
+        if(query1.value(1).toString()==sAnswer) // если совпадает ответ
         {
-            right_answer = true;
-            password = query1.value(0).toString();
+            right_answer = true; // ставим флаг на true
+            password = query1.value(0).toString(); // достаем пароль из запроса
         }
     }
 
-    if(found_login && right_answer)
+    // начинаем проверку полученных флагов
+    if(found_login && right_answer) // если логин и ответ на секретный вопрос верны
     {
-        ui->passEdit->setText(password);
+        ui->passEdit->setText(password); // то записываем в поле ввода пароля восстановленный пароль
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(password);
+        clipboard->setText(password); // и в буфер обмена
 
         QMessageBox msgBox(this);
-        msgBox.setText("Ваш пароль успешно восстановлен : " + password + "\n" + "Так же пароль был вставлен в поле ввода пароля и в буфер обмена.");
+        msgBox.setText("Ваш пароль успешно восстановлен : " + password + "\n" + "Так же пароль был вставлен в поле ввода пароля и в буфер обмена."); // и выводим в сообщении
         msgBox.exec();
         return true;
     }
-    if(found_login && (!right_answer))
+    if(found_login && (!right_answer)) // если логин верный, но ответ нет
     {
         QMessageBox msgBox(this);
-        msgBox.setText("Неверный ответ на секретный вопрос.");
+        msgBox.setText("Неверный ответ на секретный вопрос."); // выводим сообщение об этом
         msgBox.exec();
         return false;
     }
-    if(!found_login)
+    if(!found_login) // если логин не верен
     {
         QMessageBox msgBox(this);
-        msgBox.setText("Неверное имя пользователя.");
+        msgBox.setText("Неверное имя пользователя."); // выводим сообщение об этом
         msgBox.exec();
         return false;
     }
@@ -218,14 +222,14 @@ bool MainWindow::recoverPass(QString sAnswer)
 
 }
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButton_2_clicked()  // нажатие кнопки восстановления пароля
 {
-    bool login_found = false;
-    QString sQuestion;
-    if(ui->loginEdit->text().isEmpty())
+    bool login_found = false; // найден ли логин
+    QString sQuestion; // секретный вопрос
+    if(ui->loginEdit->text().isEmpty()) // если поле ввода логина пусто
     {
         QMessageBox msgBox(this);
-        msgBox.setText("Чтобы восстановить пароль, введите логин в поле ввода логина и нажмите кнопку восстановить пароль.");
+        msgBox.setText("Чтобы восстановить пароль, введите логин в поле ввода логина и нажмите кнопку восстановить пароль."); // то выводим сообщение с инструкцией
         msgBox.exec();
     }
     else
@@ -237,21 +241,21 @@ void MainWindow::on_pushButton_2_clicked()
         if(!query.exec()) qDebug() << "search failed" << query.lastError().text();
         else
         {
-            while(query.next())
+            while(query.next()) // если есть такой логин
             {
-                login_found = true;
-                sQuestion = query.value(0).toString();
+                login_found = true; // ставим флаг
+                sQuestion = query.value(0).toString(); // записываем секретный вопрос
             }
 
-            if(login_found)
+            if(login_found) // если нашли логин
             {
-                PassRemindWindow *fourth_window = new PassRemindWindow(this, this, sQuestion);
+                PassRemindWindow *fourth_window = new PassRemindWindow(this, this, sQuestion); // то вызываем окно восстановления пароля
                 fourth_window->show();
             }
-            else
+            else // если нет
             {
                 QMessageBox msgBox(this);
-                msgBox.setText("Неверный логин.");
+                msgBox.setText("Неверный логин."); // выводим сообщение
                 msgBox.exec();
             }
         }

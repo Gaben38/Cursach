@@ -27,6 +27,9 @@ public:
     bool newIkeaItem(QString name, int type, int price, int number, QString imgPath);
     int getMaxIndex();
     void refreshTableView();
+    void switchSearchElems(bool not_range);
+    void ikeaSearch();
+    void startSearch();
     ~Database();
 public slots:
     void fourth_window_finished();
@@ -48,6 +51,10 @@ private slots:
     void on_tableView_clicked(const QModelIndex &index);
 
     void on_newDBelemButton_clicked();
+
+    void on_searchComboBox_currentIndexChanged(int index);
+
+    void on_searchButton_clicked();
 
 private:
     Ui::Database *ui;
