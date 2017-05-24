@@ -74,15 +74,31 @@ bool Database::loadDb(QString dbname) // метод загрузки рабоч�
     ikea_db = QSqlDatabase::addDatabase("QSQLITE","ikea_connection"); // создаем соединение драйвером sqlite с названием ikea_connection
     ikea_db.setDatabaseName(dbname); // база данных с именем dbname
 
+
+
     if(!QFile(dbname).exists()) // если файл базы данных не существует
     {
-        qDebug() << "ikea doesnt exist"; // выводим в дебаг и возвращаем 0
+        qDebug() << "ikea doesnt exist"; // выводим в дебаг
+        if(!ikea_db.open()) qDebug() << "ikea db open/create failed"; // создаем файл базы данных
+        QSqlQuery query(ikea_db); // запрос к базе данных для создания таблицы с данными пользователей
+        if(!query.exec( "CREATE TABLE ikea_table  ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " // id ключ
+                    "name VARCHAR(255)            NOT NULL,"           // логин
+                   "type VARCHAR            NOT NULL,"          // пароль
+                   "price INTEGER    NOT NULL,"       // секретный вопрос для восстановления пароля
+                   "number INTEGER    NOT NULL"          // ответ на секретный вопрос
+                " )"
+            )) qDebug() << "pass db failed" << query.lastError().text();
 
-        return false;
+        QMessageBox msgBox(this);
+        msgBox.setText("Отсутствует база данных товаров. Была создана пустая база данных. Для заполнения используйте форму добавления товаров (только для admin).");
+        msgBox.exec();
+
     }
     else
     {
-       if(!ikea_db.open()) qDebug() << "open ikea db failed"; // открываем базу данных
+        if(!ikea_db.open()) qDebug() << "ikea db open/create failed"; // открываем файл базы данных
+    }
        model = new QSqlTableModel(this,ikea_db); // создаем табличную модель для отображения базы данных
        model->setTable("ikea_table"); // выбираем таблицу ikea_table и выводим ее содержимое в модель
        model->select();
@@ -94,7 +110,6 @@ bool Database::loadDb(QString dbname) // метод загрузки рабоч�
        for(int i=1; i<5;i++) ui->tableView->setColumnWidth( i, column_width );
        if(!can_edit) ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); // если нет права для редактирования, то меняем параметр tableView
        return true;
-    }
 }
 void Database::on_Database_finished() // эта функция вызывается при закрытии вторго окна
 {
@@ -269,7 +284,7 @@ void Database::on_tableView_clicked(const QModelIndex &index) // нажатие 
 int Database::getMaxIndex() // функция для нахождения максимального id в базе данных
 {
     QSqlQuery query(ikea_db);
-    query.prepare("SELECT MAX(id) FROM ikea_table"); // подготавливаем простой запрос
+    query.prepare("SELECT  COALESCE(MAX(id),0) FROM ikea_table"); // подготавливаем простой запрос
     if(!query.exec()) // и исполняем его
     {
         qDebug() << "max index is broken" << query.lastError().text();
