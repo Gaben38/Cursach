@@ -559,7 +559,7 @@ p, li { white-space: pre-wrap; }
      <enum>QProgressBar::TopToBottom</enum>
     </property>
     <property name="format">
-     <string>%p/%m шт.</string>
+     <string>%v/%m шт.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">

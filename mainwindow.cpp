@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QIcon icon("ikeaicon.ico");
     this->setWindowIcon(icon);
 
+    QPixmap pixIkea("ikea.png"); // загружаем картинку
+    ui->ikeaLogoLabel->setPixmap(pixIkea);
+
     db = QSqlDatabase::addDatabase("QSQLITE"); // дефолтное соединение драйвером sqlite
     db.setDatabaseName("pass_db.db");  // к базе данных pass_db.db
 

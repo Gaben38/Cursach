@@ -249,9 +249,9 @@ void Database::on_amountLeftProgressbar_valueChanged(int value) // слот вы
 
 void Database::on_tableView_clicked(const QModelIndex &index) // нажатие на элемент tableview
 {
-     int i = index.row(); // выбранная строка
+     int i = index.sibling(index.row(),0).data().toInt(); // id из выбранной строки
      QString img_path = "Img_missing";
-     i++; // смещаем для нумерации с 1
+
      qDebug() << i;
      QSqlQuery query(ikea_db);
      query.prepare("SELECT * FROM ikea_table WHERE id = (:id)"); // запрашиваем данные для данной строки(товара)
